@@ -1,0 +1,22 @@
+{
+    "cSpell.language": "ca,en",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.markdownlint": "always"
+    },
+    "editor.formatOnSave": true,
+    "editor.rulers": [
+        80
+    ],
+    "[markdown]": {
+        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+        "editor.formatOnPaste": true
+    },
+    "[rmd]": {
+        "editor.formatOnSave": true
+    },
+    "r.helpPanel.cacheIndexFiles": "Workspace",
+    "r.alwaysUseActiveTerminal": true,
+    "r.rpath.mac": "${workspaceFolder}/.conda/bin/R",
+    "r.lsp.lang": "en_US.UTF-8",
+    "r.lsp.use_stdio": true,
+}
