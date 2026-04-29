@@ -3,10 +3,22 @@
     "cSpell.words": [
         "ANOVA",
         "Bioconductor",
+        "dplyr",
+        "Epith",
         "ggplot",
+        "kable",
+        "knitr",
+        "lapply",
         "mlbench",
+        "newpage",
+        "nrow",
+        "pvalue",
+        "sapply",
+        "tidyverse",
         "Tukey",
-        "virginica"
+        "usepackage",
+        "virginica",
+        "xelatex"
     ],
     "editor.codeActionsOnSave": {
         "source.fixAll.markdownlint": "always"

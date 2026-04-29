@@ -10,21 +10,16 @@ dependencies:
   - bioconductor-complexheatmap
   - bioconductor-genomicfeatures
   - bioconductor-limma
+  - bioconductor-deseq2
   - r-caret
-  - r-gtools
-  - r-igraph
+  - r-caTools
+  - r-dt
+  - r-e1071
   - r-kableextra
   - r-kernlab
   - r-knitr
   - r-languageserver
-  - r-mass
   - r-mlbench
-  - r-nortest
   - r-plotly
-  - r-randomforest
-  - r-rmarkdown
-  - r-rsqlite
   - r-shiny
-  - r-sqldf
-  - r-survival
   - r-tidyverse # readr, dplyr, ggplot2, tidyr, etc.
