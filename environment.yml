@@ -18,6 +18,7 @@ dependencies:
   - r-knitr
   - r-languageserver
   - r-mass
+  - r-mlbench
   - r-nortest
   - r-plotly
   - r-randomforest

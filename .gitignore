@@ -47,3 +47,8 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+.conda/
+resposta.html
+resposta.pdf
+.DS_Store

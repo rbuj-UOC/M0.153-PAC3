@@ -1,5 +1,13 @@
 {
     "cSpell.language": "ca,en",
+    "cSpell.words": [
+        "ANOVA",
+        "Bioconductor",
+        "ggplot",
+        "mlbench",
+        "Tukey",
+        "virginica"
+    ],
     "editor.codeActionsOnSave": {
         "source.fixAll.markdownlint": "always"
     },

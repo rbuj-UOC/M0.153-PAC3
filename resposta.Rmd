@@ -1,0 +1,191 @@
+---
+title: 3a Prova d'Avaluació Contínua (PAC3)
+subtitle: "Programari per a l'anàlisi de dades"
+subject: "Màster universitari en bioinformàtica i bioestadística"
+author: "Robert Buj"
+date: "20/05/2026"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: false
+    highlight: tango
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: false
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{float}
+  - \usepackage[catalan]{babel}
+toc-title: "Taula de continguts"
+---
+
+\newpage
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    warning = FALSE, error = FALSE, message = FALSE,
+    # Opcions per a les figures
+    fig.align = "center"
+)
+suppressPackageStartupMessages({
+    library(datasets)
+    library(DBI)
+    library(RSQLite)
+    library(kableExtra)
+})
+```
+
+# Secció 1. Models de classificació i validació (4,5 punts)
+
+## Exercici 1. (2,25 punts)
+
+El conjunt de dades Breast Cancer Wisconsin, inclòs al paquet mlbench d'R, és un
+dataset clàssic de classificació supervisada utilitzat per predir si un tumor
+mamari és benigne o maligne a partir de diverses caracteristiques observades en
+mostres cel·lulars. Aquestes característiques descriuen aspectes morfològics de
+les cèl·lules extretes mitjançant una biòpsia per aspiració amb agulla fina del
+teixit mamari.
+
+Cada fila del dataset representa una mostra clínica d'una pacient, i les
+columnes recullen variables que mesuren propietats de les cèl·lules, com ara el
+gruix del grup cel·lular, la uniformitat de la mida i de la forma de les
+cèl·lules, l'adhesió marginal, la mida de les cèl·lules epitelials simples, la
+mida dels nuclis nus, la cromatina, els nuclèols normals i el nombre de mitosis.
+La variable resposta és `Class`, que indica el diagnòstic final: benigne o
+maligne.
+
+A partir d'aquest conjunt, es demana:
+
+a) (0.25 punts) Carregueu el conjunt de dades i realitzeu una exploració inicial
+   (resum de variables, identificació de valors perduts i tractaments aplicats,
+   etc.
+b) (0.5 punts) Dividiu el conjunt de dades en dos subconjunts:
+   a) Conjunt 1: Conjunt d'entrenament (70%)
+   b) Conjunt 2: Conjunt de test (30%)
+   Cal indicar breument el procediment utilitzat per fer aquesta partició.
+c) (0.5 punts) Genereu un model de classificació amb el conjunt d'entrenament
+   a) Ajusteu un model per predir la variable Class.
+   b) Indiqueu quin model heu utilitzat i justifiqueu breument la tria.
+d) (0.5 punts) Valideu el model amb el conjunt de test:
+   a) Obtingueu la matriu de confusió.
+   b) Calculeu les mètriques següents: accuracy - sensibilitat - especificitat -
+      F1-score
+   c) Interpreteu de forma crítica els resultats obtinguts.
+e) (0.5 punts) Compareu l'accuracy del model amb una estratègia baseline. La
+   baseline consisteix a ignorar totes les variables predictives i assignar
+   sempre a tots els casos la classe que apareix més vegades al conjunt
+   d'entrenament. En aquest dataset la classe majoritària és bening. Per tant,
+   la baseline seria:
+
+Pots carregar el dataset:
+
+```{r, attr.source=".numberLines", eval=FALSE}
+#install.packages (“mlbench”)
+library(mlbench)
+data (“BreastCancer”)
+```
+
+## Exercici 2 (2,25 punts)
+
+Durant un estudi de camp, uns investigadors van mesurar la humitat del sòl (en
+percentatge) sota diferents tipus de coberta vegetal en una zona protegida. Es
+van considerar quatre tipus de cobertes:
+
+- H1: herba baixa
+- H2: arbusts
+- H3: arbrat aclarit
+- H4: bosc dens
+
+Per a cada tipus de coberta, es van fer 6 mostres en punts diferents. Els valors
+enregistrats van ser:
+- H1: 28, 33, 30, 27, 31, 28
+- H2: 35, 37, 36, 38, 34, 33
+- H3: 40, 39, 41, 42, 40, 43
+- H4: 48, 46, 47, 45, 44, 48
+
+Es demana:
+
+a) (0.25 punts) Reformuleu les dades en un data.frame en format llarg (tidy
+   data), de manera que hi hagi una columna numèrica amb la variable humitat i
+   una columna de tipus factor amb la variable coberta. Cal mostrar l'estructura
+   final del conjunt de dades.
+b) (0.5 punts)Construïu amb ggplot2 un gràfic que permeti comparar la
+   distribució de la humitat del sòl entre els diferents tipus de coberta. A
+   continuació, interpreteu breument el gràfic i valoreu si, visualment, sembla
+   que hi ha diferències entre grups.
+c) (0.5 punts) Ajusteu un model ANOVA per estudiar si la humitat del sòl varia
+   significativament segons el tipus de coberta vegetal. Caldrà especificar el
+   model ajustat, els principals resultats obtinguts i interpretació d'aquests.
+d) (0.5 punts) Si el resultat de l'ANOVA és significatiu, apliqueu una prova
+   post-hoc de Tukey (Tukey HSD) per identificar entre quins grups hi ha
+   diferències significatives.
+e) (0.5 punts) Valideu els supòsits del model ANOVA mitjançant gràfics de
+   residus i comenteu, de manera raonada, si els supòsits de normalitat i
+   homogeneïtat de variàncies semblen acceptables.
+
+# Secció 2. Aplicacions amb Shiny i ètica (3,5 punts)
+
+## Exercici 3 (2,5 punts)
+
+En aquest exercici es proposa el desenvolupament d'una aplicació interactiva amb
+Shiny per explorar i filtrar el conjunt de dades iris, paquet inclòs a R.
+
+a) (0.25 punts) Carregueu els paquets necessaris per desenvolupar una aplicació
+   Shiny que permeti generar gràfics, mostrar resultats en format taula, i
+   descarregar dades filtrades. Construïu una interfície amb un títol principal
+   adequat i una disposició clara basada en:
+   - Una zona lateral amb els controls d'entrada.
+   - Una zona principal amb els resultats.
+b) (1 punt) La interfície ha d'incloure els elements següents:
+   - Un selector per escollir la variable que es representarà a l'eix X del
+     gràfic, que contingui únicament les variables numèriques del conjunt de
+     dades iris.
+   - Un segon selector per escollir la variable que es representarà a l'eix Y.
+   - Un tercer control per filtrar les observacions segons l'espècie, amb les
+     opcions: totes les observacions, només setosa, només versicolor, només
+     virginica.
+   - Una casella de selecció que permeti decidir si es vol mostrar o no
+   - Una línia de regressió sobre el diagrama de dispersió.
+c) (1 punt) Volem que l'aplicació mostri:
+   - Un diagrama de dispersió amb les variables seleccionades als eixos X i Y;
+   - punts diferenciats segons l'espècie;
+   - un títol dinàmic que indiqui quines variables s'estan comparant;
+   - un resum estadístic del conjunt de dades filtrat;
+   - la possibilitat de descarregar les dades filtrades en format CSV.
+d) (0.25 punts) Dins del document de resposta, expliqueu breument quina és la
+   funció dels elements següents dins d'una aplicació Shiny: ui / server /
+   reactive.
+
+## Exercici 4 (1 punt)
+
+En el desenvolupament d'una aplicació interactiva amb Shiny que permet explorar
+dades biomèdiques i generar visualitzacions i resultats estadístics en temps
+real, el disseny de l'eina pot influir directament en la interpretació que en fa
+l'usuari. Elaboreu una resposta argumentada en què analitzeu les
+responsabilitats ètiques del desenvolupador en relació amb la interpretació dels
+resultats generats per l'aplicació.
+
+# Secció 3. Bioconductor i anàlisi genòmic (2 punts)
+
+## Exercici 5 (2 punts)
+
+En aquest exercici es demana simular un conjunt de dades d'expressió gènica i
+dur a terme una anàlisi diferencial bàsica amb el paquet `DESeq2`.
+
+Es demana:
+
+a) (0.5 punts) Genereu una matriu de comptatges d'expressió gènica amb una
+   distribució de Poisson, amb 1000 gens i 20 mostres. Cal indicar clarament com
+   s'ha construït la matriu i quina estructura tenen files i les columnes.
+b) (0.5 punts) Definiu un vector o taula de metadades que diferenciï els dos
+   grups experimentals (control i tractament) i creeu l'objecte `DESeqDataSet`
+   corresponent.
+c) (0.5 punts) Executeu l'anàlisi diferencial amb `DESeq2` i obteniu la taula de
+   resultats. Cal mostrar, com a mínim, les variables principals del resultat i
+   explicar breument què representen.
+d) (0.5 punts) Representeu un histograma dels p-values i un gràfic de dispersió
+   de `log2FoldChange` versus `-log10(pvalue)`. A continuació, interpreteu
+   breument els resultats obtinguts i comenteu què permet observar cadascun dels
+   gràfics.
