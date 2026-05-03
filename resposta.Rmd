@@ -37,6 +37,9 @@ suppressPackageStartupMessages({
     library(caret)
     library(kableExtra)
     library(DESeq2)
+    library(pROC)
+    library(nortest)
+    library(car)
 })
 ```
 
@@ -82,10 +85,9 @@ e) (0.5 punts) Compareu l'accuracy del model amb una estratègia baseline. La
    d'entrenament. En aquest dataset la classe majoritària és bening. Per tant,
    la baseline seria:
 
-\[
+$$
 \text{Accuracy}_{\text{baseline}} = \frac{\text{Nombre de casos realment benign}}{\text{Total de casos}}
-\]
-
+$$
 
 **Resposta:**
 
@@ -176,25 +178,37 @@ erròniament com a malignes (FP).
 L'exactitud del 0.9659 indica que el model té un rendiment excel·lent en la
 classificació de les mostres de test.
 
-\[
-\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN} = \frac{129 + 69}{129 + 69 + 3 + 4} = \frac{198}{205} = 0.9659
-\]
+$$
+\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+= \frac{129 + 69}{129 + 69 + 3 + 4}
+= \frac{198}{205}
+= 0.9659
+$$
 
-\[
-\text{Precision} = \frac{TP}{TP + FP} = \frac{129}{129 + 3} = 0.9773
-\]
+$$
+\text{Precision} = \frac{TP}{TP + FP}
+= \frac{129}{129 + 3}
+= 0.9773
+$$
 
-\[
-\text{Specificity} = \frac{TN}{TN + FP} = \frac{69}{69 + 3} = 0.9583
-\]
+$$
+\text{Specificity} = \frac{TN}{TN + FP}
+= \frac{69}{69 + 3}
+= 0.9583
+$$
 
-\[
-\text{Sensitivity} = \frac{TP}{TP + FN} = \frac{129}{129 + 4} = 0.9699
-\]
+$$
+\text{Sensitivity} = \frac{TP}{TP + FN}
+= \frac{129}{129 + 4}
+= 0.9699
+$$
 
-\[
-F1 = 2 \cdot \frac{\text{Precision} \cdot \text{Sensitivity}}{\text{Precision} + \text{Sensitivity}} = 2 \cdot \frac{0.9773 \cdot 0.9699}{0.9773 + 0.9699} =  2 \cdot \frac{0.9478}{1.9472} = 0.9736
-\]
+$$
+F1 = 2 \cdot \frac{\text{Precision} \cdot \text{Sensitivity}}{\text{Precision} + \text{Sensitivity}}
+= 2 \cdot \frac{0.9773 \cdot 0.9699}{0.9773 + 0.9699}
+= 2 \cdot \frac{0.9478}{1.9472}
+= 0.9736
+$$
 
 Les mètriques de sensibilitat, especificitat, precisió i F1-score també
 són molt altes, indicant un bon equilibri entre la capacitat del model per
@@ -205,22 +219,51 @@ efectiu per identificar els tumors benignes. Una F1-score del 97.36% indica un
 equilibri excel·lent: el model és molt bo tant detectant malignes com evitant
 errors en la predicció.
 
+L'$\text{AUC-ROC} \ge 0.9$, per tant el model discrimina de manera excepcional.
+La corba ROC gairebé és un triangle recte, indicant que el model té una
+capacitat excel·lent per diferenciar entre les classes benignes i malignes, amb
+molt pocs falsos positius i falsos negatius.
+
+```{r, attr.source=".numberLines"}
+# Entrenem el model amb probabilitats per a l'anàlisi de l'AUC-ROC
+model <- svm(Class ~ ., data = data_train, probability = TRUE)
+# Prediccions amb probabilitats
+pred <- predict(model, newdata = data_test, probability = TRUE)
+prob_predictions <- attr(pred, "probabilities")
+# Càlcul de l'AUC-ROC
+roc_obj <- roc(data_test$Class, prob_predictions[, "malignant"])
+auc_value <- auc(roc_obj)
+# Gràfic ROC
+plot(
+    roc_obj,
+    main = sprintf("Corba ROC - SVM (AUC = %.4f)", auc_value),
+    col = "blue"
+)
+abline(a = 0, b = 1, col = "red", lty = 2)
+```
+
+Si comparem l'exactitud del model amb una estratègia baseline, on es classifica
+sempre com a benigne (la classe majoritària al conjunt d'entrenament), obtenim:
+
 ```{r, attr.source=".numberLines"}
 baseline_accuracy <- mean(data_test$Class == "benign")
 baseline_accuracy
 ```
 
-\[
-\text{Accuracy}_{\text{baseline}} = \frac{TP + FN}{TP + TN + FP + FN} = \frac{129 + 4}{129 + 69 + 3 + 4} = \frac{133}{205} = 0.6488
-\]
+$$
+\text{Accuracy}_{\text{baseline}} = \frac{TP + FN}{TP + TN + FP + FN}
+= \frac{129 + 4}{129 + 69 + 3 + 4}
+= \frac{133}{205} = 0.6488
+$$
 
-\[
-\frac{\text{Accuracy}_{\text{SVM}}- \text{Accuracy}_{\text{baseline}}}{\text{Accuracy}_{\text{baseline}}} = \frac{0.9659 - 0.6488}{0.6488} \approx 0.5
-\]
+$$
+\frac{\text{Accuracy}_{\text{SVM}} - \text{Accuracy}_{\text{baseline}}}{\text{Accuracy}_{\text{baseline}}}
+= \frac{0.9659 - 0.6488}{0.6488} \approx 0.5
+$$
 
-Amb SVM obtenim un 50% més d'exactitud que amb baseline, que és del 64.39%. Això
-indica que el model té un rendiment significativament millor que simplement
-assignar la classe majoritària a tots els casos.
+Podem concloure que amb SVM obtenim un 50% més d'exactitud que amb baseline, que
+és del 64.39%. Això indica que el model té un rendiment significativament millor
+que simplement assignar la classe majoritària a tots els casos.
 
 ## Exercici 2 (2,25 punts)
 
@@ -328,14 +371,15 @@ Valors del contrast ANOVA:
 F = \frac{\text{Mean Sq}_{\text{entre}}}{\text{Mean Sq}_{\text{intra}}} = \frac{311.93}{3.36} = 92.88
 \]
 
-- p-value: 2.2e-16 és extremadament petit, és a dir té un grau de significació
-  molt alt.
+- p-value: 2.2e-16 és extremadament petit, és a dir hi ha diferències
+  significatives en els temps de recuperació entre almenys dos grups.
 
 Nota: “coberta” representa la variabilitat entre grups i “residuals” representa
 la variabilitat intra grups.
 
-Per tant rebutgem la hipòtesi nul·la i concloem que hi ha diferències
-significatives en la humitat del sòl entre els diferents tipus de coberta.
+Com que l'ANOVA mostra diferències significatives, realitzarem una prova
+post-hoc de Tukey HSD per identificar entre quins grups hi ha diferències
+significatives.
 
 ```{r, attr.source=".numberLines"}
 # Prova post-hoc de Tukey HSD
@@ -345,33 +389,71 @@ tukey_result
 
 Les comparacions post-hoc de Tukey HSD mostren que hi ha diferències
 significatives entre tots els parells de grups, ja que tots els p-values
-ajustats són molt petits (menys de 0.001). Això confirma que cada tipus de
-coberta té una mitjana de humitat del sòl significativament diferent de les
-altres.
+ajustats (p adj) són molt petits (menys de 0.001), amb un nivell de confiança
+del 95%. Això confirma que cada tipus de coberta té una mitjana de humitat del
+sòl significativament diferent de les altres.
+
+**Avaluació de la normalitat**
 
 ```{r, attr.source=".numberLines"}
-# Gràfics de residus per validar els supòsits de l'ANOVA
-par(mfrow = c(1, 2))
-# Gràfic de residus vs ajustats per homogeneïtat de variàncies)
-plot(anova_model$fitted.values, anova_model$residuals,
-    main = "Residus vs Ajustats",
-    xlab = "Valors ajustats",
-    ylab = "Residus"
-)
-abline(h = 0, col = "red")
-# Gràfic Q-Q per normalitat dels residus
-qqnorm(anova_model$residuals, main = "Q-Q Plot dels Residus")
-qqline(anova_model$residuals, col = "red")
+plot(anova_model, which = 2, main = "Q-Q Plot")
 ```
 
-Els gràfics de residus mostren que els supòsits principals de l'ANOVA,
-normalitat dels residus i homogeneïtat de variàncies, són raonablement
-acceptables en aquest model.
+En el gràfic Q-Q s'observa que, especialment als extrems, els punts s'allunyen
+de la línia teòrica. No obstant això, a majoria dels residus s'ajusten a la
+recta, per la qual cosa no hi ha evidència en contra del supòsit de normalitat.
 
-Els residus es distribueixen de manera força aleatòria al voltant del zero i no
-mostren canvis clars de variància, cosa que suggereix homogeneïtat acceptable.
-Al Q-Q plot, els punts segueixen prou bé la línia teòrica, amb desviacions
-petites als extrems, compatibles amb normalitat raonable.
+Addicionalment, contrastem la normalitat mitjançant el test de Shapiro-Wilk (en
+el qual la hipòtesi nul·la és la que afirma que la distribució és normal):
+
+```{r, attr.source=".numberLines"}
+# Residus del model ANOVA
+res <- residuals(anova_model)
+# Prova de Saphiro-Wilk per normalitat dels residus
+sw_test <- shapiro.test(res)
+sw_test
+```
+
+NOTA: La prova de Saphiro-Wilk, que és adequada per a mostres de mida petita
+($n < 50$), ja que en nostre cas, tenim 24 residus (6 mostres per 4 grups).
+Per a mostres de mida gran es podria utilitzar la prova d'Anderson-Darling.
+
+Amb un p-value de la prova de Shapiro-Wilk de 0.3918, que és superior al nivell
+de significança de 0.05, no podem rebutjar la hipòtesi nul·la de normalitat dels
+residus. Això suggereix que els residus es distribueixen de manera
+aproximadament normal. A més el valor de W de la prova de Shapiro-Wilk és
+0.95758, que està relativament a prop de 1, indicant que els residus segueixen
+una distribució normal.
+
+No hi ha evidència que indiqui que els residus s'allunyen significativament
+d'una distribució normal, es compleix el supòsit de normalitat dels residus i
+per tant podem confiar en els resultats de l'ANOVA i les proves post-hoc
+associades.
+
+**Avaluació del compliment de la constància de la variància (homoscedasticitat)**
+
+```{r, attr.source=".numberLines"}
+plot(anova_model, which = 1, main = "Model Fit")
+```
+
+En el gràfic dels residus versus els valors ajustats es podria sospitar
+heterocedasticitat, ja que els punts no semblen estar aproximadament a la
+mateixa distància al llarg de tot el rang i la línia vermella (ajuda visual d'R)
+no s'allunya gaire del centre. No obstant això, falta confirmar aquesta condició
+amb el test de Levene.
+
+```{r, attr.source=".numberLines"}
+# Prova de Levene per homogeneïtat de variàncies
+levene_test <- leveneTest(humitat ~ coberta, data = data_df)
+levene_test
+```
+
+Amb un p-value de 0.64, que és superior al nivell de significança de 0.05, no
+podem rebutjar la hipòtesi nul·la d'homogeneïtat de variàncies entre els grups.
+
+Això suggereix que les variàncies de la humitat del sòl són similars entre els
+diferents tipus de coberta, complint així el supòsit d'homogeneïtat de
+variàncies necessari per a l'ANOVA.
 
 # Secció 2. Aplicacions amb Shiny i ètica (3,5 punts)
 
@@ -634,7 +716,4 @@ Per tant, el model no pot detectar diferències que no existeixen.
 Els gràfics confirmen que no hi ha gens diferencialment expressats, tal com
 s'espera en un conjunt de dades generat aleatòriament. Tant l'histograma com el
 diagrama de dispersió són coherents amb els resultats numèrics, on tots els
-valors ajustats són alts i no hi ha cap evidència de canvis d'expressió. En
-conjunt, els resultats mostren un comportament estadístic perfectament
-compatible amb la hipòtesi nul·la global i amb el funcionament intern de DESeq2
-quan no existeix senyal biològic real.
+valors ajustats són alts i no hi ha cap evidència de canvis d'expressió.

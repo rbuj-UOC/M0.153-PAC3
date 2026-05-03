@@ -6,6 +6,8 @@
         "dplyr",
         "Epith",
         "ggplot",
+        "heterocedasticitat",
+        "homcedasticitat",
         "kable",
         "knitr",
         "lapply",

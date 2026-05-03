@@ -11,6 +11,8 @@ dependencies:
   - bioconductor-genomicfeatures
   - bioconductor-limma
   - bioconductor-deseq2
+  - r-proc # per a l'anàlisi de corbes ROC
+  - r-car # per a l'anàlisi de residus i altres diagnòstics de models
   - r-caret
   - r-caTools
   - r-dt
@@ -20,6 +22,7 @@ dependencies:
   - r-knitr
   - r-languageserver
   - r-mlbench
+  - r-nortest # per a l'anàlisi de normalitat
   - r-plotly
   - r-shiny
   - r-tidyverse # readr, dplyr, ggplot2, tidyr, etc.
