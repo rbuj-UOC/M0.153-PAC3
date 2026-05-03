@@ -170,52 +170,67 @@ f1_score <- confusion_matrix$byClass["F1"]
 f1_score
 ```
 
-La matriu de confusió mostra que el model ha classificat correctament 129 casos
-com a benignes (TP) i 69 casos com a malignes (TN), amb només 4 casos malignes
-classificats erròniament com a benignes (FN) i 3 casos benignes classificats
+```{r, include=FALSE}
+# Extraiem els resultats per utilitzar-los en línia
+svm_TP <- confusion_matrix$table[2, 2]
+svm_TN <- confusion_matrix$table[1, 1]
+svm_FP <- confusion_matrix$table[1, 2]
+svm_FN <- confusion_matrix$table[2, 1]
+svm_accuracy <- round(confusion_matrix$overall["Accuracy"], 4)
+svm_precision <- round((svm_TP / (svm_TP + svm_FP)), 4)
+svm_specificity <- round((svm_TN / (svm_TN + svm_FP)), 4)
+svm_sensitivity <- round((svm_TP / (svm_TP + svm_FN)), 4)
+svm_f1_score <- round(f1_score, 4)
+svm_baseline_accuracy <- round(mean(data_test$Class == "benign"), 4)
+svm_improvement <- round((svm_accuracy - svm_baseline_accuracy) / svm_baseline_accuracy, 2)
+```
+
+La matriu de confusió mostra que el model ha classificat correctament `r svm_TP` casos
+com a benignes (TP) i `r svm_TN` casos com a malignes (TN), amb només `r svm_FN` casos malignes
+classificats erròniament com a benignes (FN) i `r svm_FP` casos benignes classificats
 erròniament com a malignes (FP).
 
-L'exactitud del 0.9659 indica que el model té un rendiment excel·lent en la
+L'exactitud del `r svm_accuracy` indica que el model té un rendiment excel·lent en la
 classificació de les mostres de test.
 
 $$
 \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
-= \frac{129 + 69}{129 + 69 + 3 + 4}
-= \frac{198}{205}
-= 0.9659
+= \frac{`r svm_TP` + `r svm_TN`}{`r svm_TP` + `r svm_TN` + `r svm_FP` + `r svm_FN`}
+= \frac{`r svm_TP + svm_TN`}{`r svm_TP + svm_TN + svm_FP + svm_FN`}
+= `r svm_accuracy`
 $$
 
 $$
 \text{Precision} = \frac{TP}{TP + FP}
-= \frac{129}{129 + 3}
-= 0.9773
+= \frac{`r svm_TP`}{`r svm_TP` + `r svm_FP`}
+= `r svm_precision`
 $$
 
 $$
 \text{Specificity} = \frac{TN}{TN + FP}
-= \frac{69}{69 + 3}
-= 0.9583
+= \frac{`r svm_TN`}{`r svm_TN` + `r svm_FP`}
+= `r svm_specificity`
 $$
 
 $$
 \text{Sensitivity} = \frac{TP}{TP + FN}
-= \frac{129}{129 + 4}
-= 0.9699
+= \frac{`r svm_TP`}{`r svm_TP` + `r svm_FN`}
+= `r svm_sensitivity`
 $$
 
 $$
 F1 = 2 \cdot \frac{\text{Precision} \cdot \text{Sensitivity}}{\text{Precision} + \text{Sensitivity}}
-= 2 \cdot \frac{0.9773 \cdot 0.9699}{0.9773 + 0.9699}
-= 2 \cdot \frac{0.9478}{1.9472}
-= 0.9736
+= 2 \cdot \frac{`r svm_precision` \cdot `r svm_sensitivity`}{`r svm_precision` + `r svm_sensitivity`}
+= 2 \cdot \frac{`r round(svm_precision * svm_sensitivity, 4)`}{`r round(svm_precision + svm_sensitivity, 4)`}
+= `r svm_f1_score`
 $$
 
 Les mètriques de sensibilitat, especificitat, precisió i F1-score també
 són molt altes, indicant un bon equilibri entre la capacitat del model per
 identificar correctament les classes benignes i malignes. Una sensibilitat del
-96.99% indica que el model és molt bo per identificar els tumors malignes,
-mentre que una especificitat del 95.83% ens diu que el model també és molt
-efectiu per identificar els tumors benignes. Una F1-score del 97.36% indica un
+`r round(svm_sensitivity * 100, 2)`% indica que el model és molt bo per identificar els tumors malignes,
+mentre que una especificitat del `r round(svm_specificity * 100, 2)`% ens diu que el model també és molt
+efectiu per identificar els tumors benignes. Una F1-score del `r round(svm_f1_score * 100, 2)`% indica un
 equilibri excel·lent: el model és molt bo tant detectant malignes com evitant
 errors en la predicció.
 
@@ -354,24 +369,35 @@ Les hipòtesis són:
 - Hipòtesis alternativa (H~1~): Almenys un tipus de coberta té una mitjana
   d'humitat del sòl diferent.
 
+```{r, include=FALSE}
+# Extraiem els resultats per utilitzar-los en línia
+anova_summary_df <- summary(anova_model)[[1]]
+anova_sum_sq_coberta <- round(anova_summary_df["coberta", "Sum Sq"], 1)
+anova_sum_sq_residuals <- round(anova_summary_df["Residuals", "Sum Sq"], 1)
+anova_mean_sq_coberta <- round(anova_summary_df["coberta", "Mean Sq"], 2)
+anova_mean_sq_residuals <- round(anova_summary_df["Residuals", "Mean Sq"], 2)
+anova_f_statistic <- round(anova_summary_df["coberta", "F value"], 2)
+anova_p_value <- anova_summary_df["coberta", "Pr(>F)"]
+```
+
 Valors del contrast ANOVA:
 
-- Sum Sq: 935.8 (coberta) ≫ 67.2 (residual), cosa que ja suggereix que coberta
+- Sum Sq: `r anova_sum_sq_coberta` (coberta) ≫ `r anova_sum_sq_residuals` (residual), cosa que ja suggereix que coberta
   explica una gran part de la variació, és a dir hi ha diferències clares entre
   grups (coberta), mentre que la variació dins dels grups (residuals) és molt
   menor.
-- Mean Sq (Sum Sq / df): 311.93 (coberta) i 3.36 (residuals), reforçant la idea
+- Mean Sq (Sum Sq / df): `r anova_mean_sq_coberta` (coberta) i `r anova_mean_sq_residuals` (residuals), reforçant la idea
   que la variabilitat entre grups és molt més gran que la variabilitat dins dels
   grups.
 - df (graus de llibertat): 3 (coberta, num_grups - 1) i 20 (residuals, num_observacions - num_grups)
-- Estadístic F: 92.88 és un valor molt alt, per tant les diferències entre
+- Estadístic F: `r anova_f_statistic` és un valor molt alt, per tant les diferències entre
   grups són molt més grans que les variacions dins dels grups:
 
 \[
-F = \frac{\text{Mean Sq}_{\text{entre}}}{\text{Mean Sq}_{\text{intra}}} = \frac{311.93}{3.36} = 92.88
+F = \frac{\text{Mean Sq}_{\text{entre}}}{\text{Mean Sq}_{\text{intra}}} = \frac{`r anova_mean_sq_coberta`}{`r anova_mean_sq_residuals`} = `r anova_f_statistic`
 \]
 
-- p-value: 2.2e-16 és extremadament petit, és a dir hi ha diferències
+- p-value: `r format(anova_p_value, scientific = TRUE)` és extremadament petit, és a dir hi ha diferències
   significatives en els temps de recuperació entre almenys dos grups.
 
 Nota: “coberta” representa la variabilitat entre grups i “residuals” representa
@@ -418,11 +444,17 @@ NOTA: La prova de Saphiro-Wilk, que és adequada per a mostres de mida petita
 ($n < 50$), ja que en nostre cas, tenim 24 residus (6 mostres per 4 grups).
 Per a mostres de mida gran es podria utilitzar la prova d'Anderson-Darling.
 
-Amb un p-value de la prova de Shapiro-Wilk de 0.3918, que és superior al nivell
+```{r, include=FALSE}
+# Extreia el valor p i l'estadístic W del test de Shapiro-Wilk
+sw_p_value <- round(sw_test$p.value, 4)
+sw_statistic <- round(sw_test$statistic, 5)
+```
+
+Amb un p-value de la prova de Shapiro-Wilk de `r sw_p_value`, que és superior al nivell
 de significança de 0.05, no podem rebutjar la hipòtesi nul·la de normalitat dels
 residus. Això suggereix que els residus es distribueixen de manera
 aproximadament normal. A més el valor de W de la prova de Shapiro-Wilk és
-0.95758, que està relativament a prop de 1, indicant que els residus segueixen
+`r sw_statistic`, que està relativament a prop de 1, indicant que els residus segueixen
 una distribució normal.
 
 No hi ha evidència que indiqui que els residus s'allunyen significativament
@@ -448,7 +480,12 @@ levene_test <- leveneTest(humitat ~ coberta, data = data_df)
 levene_test
 ```
 
-Amb un p-value de 0.64, que és superior al nivell de significança de 0.05, no
+```{r, include=FALSE}
+# Extraiem el valor p del test de Levene
+levene_p_value <- round(levene_test$`Pr(>F)`[1], 4)
+```
+
+Amb un p-value de `r levene_p_value`, que és superior al nivell de significança de 0.05, no
 podem rebutjar la hipòtesi nul·la d'homogeneïtat de variàncies entre els grups.
 
 Això suggereix que les variàncies de la humitat del sòl són similars entre els
@@ -660,7 +697,7 @@ Les variables principals del resultat de `DESeq2` són:
 
 - **baseMean**: La mitjana dels comptatges normalitzats per a cada gen a través de totes les mostres.
 - **log2FoldChange**: El logaritme en base 2 del fold change entre els grups de tractament i control. Indica la magnitud i direcció del canvi d'expressió.
-- **lfcSE**: L'error estàndard associat al log2FoldChange, que reflecteix la incertesa de l'estimació del fold change.
+- **lfcSE**: L'error estàndard associat al `log2FoldChange`, que reflecteix la incertesa de l'estimació del fold change.
 - **stat**: L'estadístic de test que s'utilitza per avaluar la significació de la diferència d'expressió entre els grups.
 - **pvalue**: El valor p associat a l'estadístic de test, que indica la probabilitat d'obtenir un resultat tan extrem com el observat sota la hipòtesi nul·la de no diferència d'expressió.
 - **padj**: El valor p ajustat per al control de la taxa de falsos positius (FDR), que permet identificar els gens diferencialment expressats tenint en compte les múltiples comparacions.
@@ -702,14 +739,14 @@ didàctic, on tots els p-values ajustats són molt alts i no hi ha cap evidènci
 de significació estadística.
 
 El diagrama de dispersió mostra els punts concentrats al voltant de
-log2FoldChange = 0, amb valors baixos de -log10(p-value). Aquest patró indica
+`log2FoldChange = 0`, amb valors baixos de `-log10(p-value)`. Aquest patró indica
 que:
 
 - els canvis d'expressió estimats són petits i simètrics al voltant de zero,
 - els p-values són alts,
 - no hi ha cap gen que superi cap llindar de significació.
 
-Els valors de log2FoldChange són petits i els padj són propers a 1, perquè les
+Els valors de `log2FoldChange` són petits i els padj són propers a 1, perquè les
 dades provenen d'una distribució de Poisson idèntica per a totes les mostres.
 Per tant, el model no pot detectar diferències que no existeixen.
 
