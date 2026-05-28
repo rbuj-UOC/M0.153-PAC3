@@ -50,5 +50,7 @@ rsconnect/
 
 .conda/
 resposta.html
+resposta.log
 resposta.pdf
+resposta.tex
 .DS_Store
