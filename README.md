@@ -1,6 +1,6 @@
 # PAC3
 
-## Utilització del codi
+## Desenvolupament amb contenidors o entorns virtuals
 
 L'avantatge d'utilitzar un contenidor o un entorn virtual és que permet aïllar
 les dependències del projecte del sistema operatiu, evitant conflictes entre
@@ -17,18 +17,10 @@ diferents projectes i versions de biblioteques.
 #### Creació del contenidor
 
 Una vegada oberta la carpeta del projecte a VS Code, clicarem a la icona
-"Open a Remote Window" i seleccionarem "Reopen in Container".
+`Open a Remote Window` i seleccionarem `Reopen in Container`.
 
 <p align="center">
-  <img src="./img/connect.png" width="73px" style="border:solid 1px red;">
-</p>
-
-Aquesta ordre crearà un contenidor i instal·larà totes les dependències. Una
-vegada s'ha completat el procés de creació del contenidor, cal instal·lar les
-extensions recomanades per al projecte:
-
-<p align="center">
-  <img src="./img/extensions.png" width="480px" style="border:solid 1px red;">
+  <img src="./img/connect.avif" width="73px" style="border:solid 1px red;">
 </p>
 
 Un cop creat i activat l'entorn virtual, ja es pot executar el codi a VS Code.
@@ -36,13 +28,27 @@ Un cop creat i activat l'entorn virtual, ja es pot executar el codi a VS Code.
 > [!IMPORTANT]
 > Abans d'iniciar o crear el contenidor cal que Docker Desktop estigui en execució.
 
-Per tancar la connexió, clicarem a la icona "Dev Container: Miniconda" i
-seleccionarem "Close Remote Connection". El contenidor es pot aturar des del
+Per tancar la connexió, clicarem a la icona `Dev Container: Miniconda` i
+seleccionarem `Close Remote Connection`. El contenidor es pot aturar des del
 tauler de Docker Desktop.
 
 <p align="center">
-  <img src="./img/disconnect.png" width="511px" style="border:solid 1px red;">
+  <img src="./img/disconnect.avif" width="511px" style="border:solid 1px red;">
 </p>
+
+#### Creació del Devcontainer
+
+No cal crear un devcontainer, ja que el projecte es pot executar i depurar a VS Code sense necessitat de contenidors. No obstant això, si voleu reproduir els passos per crear un devcontainer per a aquest projecte, podeu seguir els passos següents:
+
+1. Obre la paleta d'ordres (Ctrl+Shift+P) i selecciona `Dev Containers: Add Dev Container Configuration Files...`.
+2. Selecciona l'opció `Add configuration files to workspace`.
+3. Selecciona l'opció `Miniconda` com a plantilla de devcontainer.
+4. No cal instal·lar dependències addicionals, per la qual cosa pots prémer el botó `Ok` per continuar.
+5. Es crearà un fitxer `devcontainer.json` a la carpeta `.devcontainer` del projecte. Pots obrir-lo i revisar-ne el contingut. En el fitxer `devcontainer.json`, pots afegir configuracions addicionals si cal, com ara extensions de VS Code que vulguis instal·lar automàticament dins del contenidor.
+6. Per iniciar el devcontainer, obriu la paleta d'ordres (Ctrl+Shift+P) i seleccioneu `Dev Containers: Reopen in Container`. Això obrirà el projecte en un contenidor de desenvolupament amb la configuració especificada al fitxer `devcontainer.json`.
+
+> [!TIP]
+> Podeu trobar més informació sobre com utilitzar devcontainers a la [documentació oficial](https://aka.ms/devcontainers) de Microsoft o la pàgina del repositori de devcontainers a [devcontainers-miniconda](https://hub.docker.com/r/microsoft/devcontainers-miniconda)
 
 ### Opció 2: Conda
 
@@ -50,7 +56,7 @@ tauler de Docker Desktop.
 
 - miniconda
   - (macos) es recomana instal·lar-ho a través de [Homebrew](https://brew.sh/)
-  - (windows) es recomana utilitzar l'[instal·lador](<<https://www.anaconda.com/docs/getting-started/miniconda/install/overview>)
+  - (windows) es recomana utilitzar l'[instal·lador](https://www.anaconda.com/docs/getting-started/miniconda/install/overview)
 - Visual Studio Code: [instal·lar](https://code.visualstudio.com/)
 
 #### Creació de l'entorn virtual
